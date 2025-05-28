@@ -1,0 +1,9 @@
+# Ref: https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-FILES
+
+comment = 'Asynchronous SQL dispatcher'
+default_version = '0.1.0'
+directory = 'extension/sql'
+schema = 'pgdispatch'
+relocatable = false
+requires = 'pgcrypto, pg_cron'
+superuser = false
