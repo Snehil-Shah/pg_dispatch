@@ -21,9 +21,9 @@ COMMENT ON SCHEMA pgdispatch IS
 'Reserved for the pg_dispatch extension';
 
 /**
- * (internal) ### pgdispatch._schedule_job
+ * (internal) ### pgdispatch._schedule_job( command TEXT, delay INTERVAL )
  *
- * Internal function for scheduling temporary cron jobs
+ * Internal function for scheduling temporary cron jobs.
  *
  * #### Parameters:
  *   - **command** (`TEXT`) - The SQL statement to execute
@@ -89,7 +89,7 @@ COMMENT ON FUNCTION pgdispatch._schedule_job(TEXT, INTERVAL) IS
 /**
  * ### pgdispatch.fire( command TEXT )
  *
- * Dispatches an SQL command for asynchronous execution
+ * Dispatches an SQL command for asynchronous execution.
  *
  * ```sql
  * SELECT pgdispatch.fire('SELECT pg_sleep(40);');
@@ -114,7 +114,7 @@ COMMENT ON FUNCTION pgdispatch.fire(TEXT) IS
 /**
  * ### pgdispatch.snooze( command TEXT, delay INTERVAL )
  *
- * Dispatches a delayed SQL command for asynchronous execution
+ * Dispatches a delayed SQL command for asynchronous execution.
  *
  * ```sql
  * SELECT pgdispatch.snooze('SELECT pg_sleep(20);', '20 seconds');
