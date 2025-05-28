@@ -36,39 +36,7 @@ SELECT dbdev.install(Snehil-Shah@pg_dispatch);
 CREATE EXTENSION "Snehil-Shah@pg_dispatch";
 ```
 
-### pgdispatch.fire( command TEXT )
-
-Dispatches an SQL command for asynchronous execution.
-
-```sql
-SELECT pgdispatch.fire('SELECT pg_sleep(40);');
-```
-
-#### Parameters
-
-- **command** (`TEXT`): The SQL statement to dispatch
-
-#### Returns
-
-- `VOID`
-
-### pgdispatch.snooze( command TEXT, delay INTERVAL )
-
-Dispatches a delayed SQL command for asynchronous execution
-
-**Note**: The delay is scheduled asynchronously and will not block your main transaction.
-
-```sql
-SELECT pgdispatch.snooze('SELECT pg_sleep(20);', '20 seconds');
-```
-
-#### Parameters
-
-- **command** (`TEXT`): The SQL statement to dispatch
-- **delay** (`INTERVAL`): How long to delay the execution (truncates to seconds precision)
-
-#### Returns
-
-- `VOID`
+<!-- <docs> -->
+<!-- /<docs> -->
 
 ***
