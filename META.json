@@ -1,0 +1,38 @@
+{
+  "name": "pg_dispatch",
+  "abstract": "Asynchronous SQL dispatcher",
+  "version": "0.1.2",
+  "maintainer": "Snehil Shah <snehilshah.989@gmail.com>",
+  "license": "postgresql",
+  "provides": {
+    "pg_dispatch": {
+      "abstract": "Asynchronous SQL dispatcher",
+      "file": "pg_dispatch--0.1.2.sql",
+      "docfile": "README.md",
+      "version": "0.1.2"
+    }
+  },
+  "resources": {
+    "bugtracker": {
+        "web": "https://github.com/Snehil-Shah/pg_dispatch/issues/"
+    },
+    "repository": {
+      "url":  "git://github.com/Snehil-Shah/pg_dispatch.git",
+      "web":  "https://github.com/Snehil-Shah/pg_dispatch/",
+      "type": "git"
+    }
+  },
+  "generated_by": "Snehil Shah",
+  "meta-spec": {
+    "version": "1.0.0",
+    "url": "https://pgxn.org/meta/spec.txt"
+  },
+  "tags": [
+    "async",
+    "dispatcher",
+    "promise",
+    "defer",
+    "pg_late",
+    "pg_tle"
+  ]
+}

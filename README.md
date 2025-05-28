@@ -32,6 +32,8 @@ To learn how to install `dbdev` and published TLE extensions, read [here](https:
 > [!WARNING]
 > This extension is installed in the `pgdispatch` schema and can potentially cause namespace collisions if you already had one before.
 
+You can also manually install the distribution from PGXN [here](https://pgxn.org/dist/pg_dispatch/).
+
 ## Usage
 
 ```sql
