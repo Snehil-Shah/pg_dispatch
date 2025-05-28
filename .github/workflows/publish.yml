@@ -2,11 +2,10 @@ name: Publish
 
 on:
   workflow_run:
-    workflows: ["Docs"]
+    workflows:
+      - Docs
     types:
       - completed
-    branches:
-      - main
 
 jobs:
   dbdev:
