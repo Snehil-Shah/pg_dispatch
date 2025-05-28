@@ -1,0 +1,120 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: ["Docs"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  dbdev:
+    name: database.dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dbdev CLI
+        run: |
+          curl -fsSL $(curl -s https://api.github.com/repos/supabase/dbdev/releases/latest | grep "browser_download_url.*linux-amd64\.deb" | cut -d '"' -f 4) -o dbdev.deb
+          sudo dpkg -i dbdev.deb
+
+      - name: Install expect
+        run: sudo apt-get update && sudo apt-get install -y expect
+
+      - name: Login to database.dev
+        env:
+          DBDEV_TOKEN: ${{ secrets.DBDEV_TOKEN }}
+        run: |
+          expect -c "
+          spawn dbdev login
+          expect \"*token*\"
+          send \"$DBDEV_TOKEN\r\"
+          expect eof
+          "
+
+      - name: Publish to database.dev
+        run: dbdev publish
+
+  github:
+    name: GitHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get version from control file
+        id: version
+        run: |
+          VERSION=$(grep "default_version" pg_dispatch.control | sed "s/.*'\(.*\)'.*/\1/")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version exists
+        id: version_check
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          if git tag | grep -q "v$VERSION"; then
+            echo "Version v$VERSION already exists, skipping release"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version v$VERSION detected, proceeding with release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        if: ${{ steps.version_check.outputs.should_release == 'true' }}
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s" --no-merges)
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s" --no-merges)
+          fi
+
+          # Categorize commits (only subject lines)
+          FEATURES=$(echo "$COMMITS" | grep -E "^feat(\(.*\))?:" | sed -E 's/^feat(\(.*\))?: /- /' || true)
+          FIXES=$(echo "$COMMITS" | grep -E "^fix(\(.*\))?:" | sed -E 's/^fix(\(.*\))?: /- /' || true)
+          CHORES=$(echo "$COMMITS" | grep -E "^chore(\(.*\))?:" | sed -E 's/^chore(\(.*\))?: /- /' || true)
+          BUILDS=$(echo "$COMMITS" | grep -E "^build(\(.*\))?:" | sed -E 's/^build(\(.*\))?: /- /' || true)
+
+          # Build changelog
+          CHANGELOG=""
+
+          if [ -n "$FEATURES" ]; then
+            CHANGELOG="${CHANGELOG}### Features"$'\n'"$FEATURES"$'\n\n'
+          fi
+
+          if [ -n "$FIXES" ]; then
+            CHANGELOG="${CHANGELOG}### Bug Fixes"$'\n'"$FIXES"$'\n\n'
+          fi
+
+          if [ -n "$CHORES" ] || [ -n "$BUILDS" ]; then
+            CHANGELOG="${CHANGELOG}### Maintenance"$'\n'
+            [ -n "$CHORES" ] && CHANGELOG="${CHANGELOG}$CHORES"$'\n'
+            [ -n "$BUILDS" ] && CHANGELOG="${CHANGELOG}$BUILDS"$'\n'
+          fi
+
+          # Output to GitHub Actions (safer than echo -e)
+          {
+            echo "changelog<<EOF"
+            printf '%s' "$CHANGELOG"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ steps.version_check.outputs.should_release == 'true' }}
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            Release of `pg_dispatch` version ${{ steps.version.outputs.version }}.
+
+            Go to [database.dev](https://database.dev/Snehil_Shah/pg_dispatch) for the latest installation.
+
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
