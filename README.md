@@ -42,7 +42,7 @@ CREATE EXTENSION "Snehil_Shah@pg_dispatch";
 
 ### pgdispatch.fire( command TEXT )
 
-Dispatches an SQL command for asynchronous execution
+Dispatches an SQL command for asynchronous execution.
 
 ```sql
 SELECT pgdispatch.fire('SELECT pg_sleep(40);');
@@ -56,7 +56,7 @@ SELECT pgdispatch.fire('SELECT pg_sleep(40);');
 
 ### pgdispatch.snooze( command TEXT, delay INTERVAL )
 
-Dispatches a delayed SQL command for asynchronous execution
+Dispatches a delayed SQL command for asynchronous execution.
 
 ```sql
 SELECT pgdispatch.snooze('SELECT pg_sleep(20);', '20 seconds');
