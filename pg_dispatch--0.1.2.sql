@@ -87,7 +87,7 @@ COMMENT ON FUNCTION pgdispatch._schedule_job(TEXT, INTERVAL) IS
 'Internal function for cron job scheduling - use pg_dispatch.fire or pg_dispatch.snooze instead';
 
 /**
- * ### pgdispatch.fire
+ * ### pgdispatch.fire( command TEXT )
  *
  * Dispatches an SQL command for asynchronous execution
  *
@@ -112,7 +112,7 @@ COMMENT ON FUNCTION pgdispatch.fire(TEXT) IS
 'Dispatch an SQL command for asynchronous execution';
 
 /**
- * ### pgdispatch.snooze
+ * ### pgdispatch.snooze( command TEXT, delay INTERVAL )
  *
  * Dispatches a delayed SQL command for asynchronous execution
  *

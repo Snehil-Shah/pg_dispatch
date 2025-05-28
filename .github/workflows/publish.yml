@@ -45,6 +45,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Get version from control file
         id: version
@@ -76,30 +79,43 @@ jobs:
             COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s" --no-merges)
           fi
 
-          # Categorize commits (only subject lines)
-          FEATURES=$(echo "$COMMITS" | grep -E "^feat(\(.*\))?:" | sed -E 's/^feat(\(.*\))?: /- /' || true)
-          FIXES=$(echo "$COMMITS" | grep -E "^fix(\(.*\))?:" | sed -E 's/^fix(\(.*\))?: /- /' || true)
-          CHORES=$(echo "$COMMITS" | grep -E "^chore(\(.*\))?:" | sed -E 's/^chore(\(.*\))?: /- /' || true)
-          BUILDS=$(echo "$COMMITS" | grep -E "^build(\(.*\))?:" | sed -E 's/^build(\(.*\))?: /- /' || true)
+          if [ -z "$COMMITS" ] || [ "$COMMITS" = "" ]; then
+            echo "No commits since last tag, trying to get commits from previous tag..."
+            PREV_TAG=$(git tag --sort=-version:refname | head -2 | tail -1)
+            echo "Previous tag: $PREV_TAG"
+            if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "$LAST_TAG" ]; then
+              COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"%s" --no-merges)
+              echo "Commits since $PREV_TAG:"
+              echo "$COMMITS"
+            fi
+          fi
 
-          # Build changelog
+          FEATURES=$(echo "$COMMITS" | grep -E "^feat" | sed 's/^/- /' || true)
+          FIXES=$(echo "$COMMITS" | grep -E "^fix" | sed 's/^/- /' || true)
+          CHORES=$(echo "$COMMITS" | grep -E "^chore" | sed 's/^/- /' || true)
+          BUILDS=$(echo "$COMMITS" | grep -E "^build" | sed 's/^/- /' || true)
+          DOCS=$(echo "$COMMITS" | grep -E "^docs" | sed 's/^/- /' || true)
+          OTHER_COMMITS=$(echo "$COMMITS" | grep -v -E "^(feat|fix|chore|build|docs)" | sed 's/^/- /' || true)
+
           CHANGELOG=""
-
           if [ -n "$FEATURES" ]; then
             CHANGELOG="${CHANGELOG}### Features"$'\n'"$FEATURES"$'\n\n'
           fi
-
           if [ -n "$FIXES" ]; then
             CHANGELOG="${CHANGELOG}### Bug Fixes"$'\n'"$FIXES"$'\n\n'
           fi
-
+          if [ -n "$DOCS" ]; then
+            CHANGELOG="${CHANGELOG}### Documentation"$'\n'"$DOCS"$'\n\n'
+          fi
           if [ -n "$CHORES" ] || [ -n "$BUILDS" ]; then
             CHANGELOG="${CHANGELOG}### Maintenance"$'\n'
             [ -n "$CHORES" ] && CHANGELOG="${CHANGELOG}$CHORES"$'\n'
             [ -n "$BUILDS" ] && CHANGELOG="${CHANGELOG}$BUILDS"$'\n'
           fi
+          if [ -n "$OTHER_COMMITS" ]; then
+            CHANGELOG="${CHANGELOG}### Other Changes"$'\n'"$OTHER_COMMITS"$'\n'
+          fi
 
-          # Output to GitHub Actions (safer than echo -e)
           {
             echo "changelog<<EOF"
             printf '%s' "$CHANGELOG"
@@ -111,7 +127,7 @@ jobs:
         if: ${{ steps.version_check.outputs.should_release == 'true' }}
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
           body: |
             Release of `pg_dispatch` version ${{ steps.version.outputs.version }}.
 
