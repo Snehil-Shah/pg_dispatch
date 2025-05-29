@@ -37,6 +37,23 @@ jobs:
       - name: Publish to database.dev
         run: dbdev publish
 
+  pgxn:
+    name: PGXN
+    runs-on: ubuntu-latest
+    container: pgxn/pgxn-tools
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bundle the Release
+        run: pgxn-bundle
+
+      - name: Publish to PGXN
+        env:
+          PGXN_USERNAME: ${{ secrets.PGXN_USERNAME }}
+          PGXN_PASSWORD: ${{ secrets.PGXN_PASSWORD }}
+        run: pgxn-release || true # suppress errors on duplicate releases
+
   github:
     name: GitHub
     runs-on: ubuntu-latest
@@ -131,7 +148,9 @@ jobs:
           body: |
             Release of `pg_dispatch` version ${{ steps.version.outputs.version }}.
 
-            Go to [database.dev](https://database.dev/Snehil_Shah/pg_dispatch) for the latest installation.
+            Find the official distributions from:
+            - [database.dev](https://database.dev/Snehil_Shah/pg_dispatch)
+            - [PGXN](https://pgxn.org/dist/pg_dispatch)
 
             ## Changes
             ${{ steps.changelog.outputs.changelog }}
