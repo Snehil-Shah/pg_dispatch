@@ -1,10 +1,10 @@
 # pg_dispatch
 
-> A [TLE](https://github.com/aws/pg_tle) compliant alternative to [pg_later](https://github.com/ChuckHend/pg_later).
+> A [TLE](https://github.com/aws/pg_tle)-compliant alternative to [pg_later](https://github.com/ChuckHend/pg_later).
 
 An asynchronous task dispatcher for PostgreSQL that helps unblock your main transaction by offloading heavy SQL as deferrable jobs, allowing you to run SQL queries asynchronously.
 
-This is meant to be a [TLE](https://github.com/aws/pg_tle) compliant alternative to [pg_later](https://github.com/ChuckHend/pg_later) built on top of [pg_cron](https://github.com/citusdata/pg_cron), which means you can easily use it in sandboxed environments like Supabase and AWS RDS.
+This is meant to be a [TLE](https://github.com/aws/pg_tle)-compliant alternative to [pg_later](https://github.com/ChuckHend/pg_later) built on top of [pg_cron](https://github.com/citusdata/pg_cron), which means you can easily use it in sandboxed environments like Supabase and AWS RDS.
 
 ## Use cases
 

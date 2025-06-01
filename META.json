@@ -1,7 +1,7 @@
 {
   "name": "pg_dispatch",
   "abstract": "Asynchronous SQL dispatcher",
-  "description": "A TLE compliant asynchronous SQL dispatcher, allowing you to run SQL queries asynchronously.",
+  "description": "A TLE-compliant asynchronous SQL dispatcher for running SQL queries asynchronously.",
   "version": "0.1.3",
   "maintainer": "Snehil Shah <snehilshah.989@gmail.com>",
   "license": "postgresql",
