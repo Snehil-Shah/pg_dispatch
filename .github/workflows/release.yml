@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare the release
-        run: make bundle
+      - name: Bundle the release
+        run: make prepare
 
       - name: Install dbdev CLI
         run: |
@@ -119,7 +119,8 @@ jobs:
           CHORES=$(echo "$COMMITS" | grep -E "^chore" | sed 's/^/- /' || true)
           BUILDS=$(echo "$COMMITS" | grep -E "^build" | sed 's/^/- /' || true)
           DOCS=$(echo "$COMMITS" | grep -E "^docs" | sed 's/^/- /' || true)
-          OTHER_COMMITS=$(echo "$COMMITS" | grep -v -E "^(feat|fix|chore|build|docs)" | sed 's/^/- /' || true)
+          TEST=$(echo "$COMMITS" | grep -E "^test" | sed 's/^/- /' || true)
+          OTHER_COMMITS=$(echo "$COMMITS" | grep -v -E "^(feat|fix|chore|build|docs|test)" | sed 's/^/- /' || true)
 
           CHANGELOG=""
           if [ -n "$FEATURES" ]; then
@@ -130,6 +131,9 @@ jobs:
           fi
           if [ -n "$DOCS" ]; then
             CHANGELOG="${CHANGELOG}### Documentation"$'\n'"$DOCS"$'\n\n'
+          fi
+          if [ -n "$TEST" ]; then
+            CHANGELOG="${CHANGELOG}### Tests"$'\n'"$TEST"$'\n\n'
           fi
           if [ -n "$CHORES" ] || [ -n "$BUILDS" ]; then
             CHANGELOG="${CHANGELOG}### Maintenance"$'\n'
