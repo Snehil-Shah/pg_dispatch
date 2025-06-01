@@ -1,12 +1,7 @@
 name: Publish
 
-# The Docs workflow only runs on changes to SQL or control files and hence is a good indicator of whether to trigger a new release. Additionally, it ensures the docs are updated before publishing a new release.
 on:
-  workflow_run:
-    workflows:
-      - Docs
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   dbdev:
@@ -15,6 +10,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Prepare the release
+        run: make bundle
 
       - name: Install dbdev CLI
         run: |
@@ -46,7 +44,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Bundle the Release
+      - name: Prepare the release
+        run: make prepare
+
+      - name: Bundle the release
         run: pgxn-bundle
 
       - name: Publish to PGXN
@@ -85,6 +86,10 @@ jobs:
             echo "New version v$VERSION detected, proceeding with release"
             echo "should_release=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Bundle the release
+        if: ${{ steps.version_check.outputs.should_release == 'true' }}
+        run: make dist
 
       - name: Generate changelog
         id: changelog
@@ -156,3 +161,4 @@ jobs:
 
             ## Changes
             ${{ steps.changelog.outputs.changelog }}
+          files: dist/pg_dispatch-${{ steps.version.outputs.version }}.zip
