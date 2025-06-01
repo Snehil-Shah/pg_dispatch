@@ -1,4 +1,3 @@
 # Ignore build artifacts
-dist/
 META.json
 pg_dispatch--*.sql

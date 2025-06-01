@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Bundle the release
+      - name: Prepare the release
         run: make prepare
 
       - name: Install dbdev CLI
@@ -48,6 +48,10 @@ jobs:
         run: make prepare
 
       - name: Bundle the release
+        env:
+          GIT_BUNDLE_OPTS: >-
+            --add-file META.json
+            --add-file pg_dispatch--*.sql
         run: pgxn-bundle
 
       - name: Publish to PGXN
@@ -86,10 +90,6 @@ jobs:
             echo "New version v$VERSION detected, proceeding with release"
             echo "should_release=true" >> $GITHUB_OUTPUT
           fi
-
-      - name: Bundle the release
-        if: ${{ steps.version_check.outputs.should_release == 'true' }}
-        run: make dist
 
       - name: Generate changelog
         id: changelog
@@ -165,4 +165,3 @@ jobs:
 
             ## Changes
             ${{ steps.changelog.outputs.changelog }}
-          files: dist/pg_dispatch-${{ steps.version.outputs.version }}.zip

@@ -6,18 +6,13 @@ PG_CONFIG ?= pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
-.PHONY: prepare dist docs test
+.PHONY: prepare docs test
 prepare:
+	make clean
 	cp pg_dispatch.sql $(EXTENSION)--$(EXTVERSION).sql
 	sed 's/@VERSION@/$(EXTVERSION)/g' META.json.in > META.json
 
-dist:
-	make prepare
-	mkdir -p dist
-	git archive --format zip --prefix=$(EXTENSION)-$(EXTVERSION)/ -o dist/$(EXTENSION)-$(EXTVERSION).zip HEAD
-
 clean:
-	rm -rf dist/
 	rm -f META.json
 	rm -f $(EXTENSION)--*.sql
 
