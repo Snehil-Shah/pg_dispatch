@@ -6,7 +6,7 @@ PG_CONFIG ?= pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
-.PHONY: prepare docs test
+.PHONY: prepare clean docs test
 prepare:
 	make clean
 	cp pg_dispatch.sql $(EXTENSION)--$(EXTVERSION).sql
