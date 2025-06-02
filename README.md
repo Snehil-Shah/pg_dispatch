@@ -16,7 +16,7 @@ You can offload the bulky and asynchronous **_side-effects_** (written as Postgr
 ## Prerequisites
 
 - `PostgreSQL` >= v13
-- `pg_cron` >= v1.5
+- `pg_cron` >= v1.5.0
 - `pgcrypto`
 
 ## Installation
