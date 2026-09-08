@@ -75,4 +75,10 @@ SELECT pgdispatch.snooze('SELECT pg_sleep(20);', '20 seconds');
 
 <!-- /<docs> -->
 
+## Press coverage
+
+- I-Programmer: [pg_disatch - Run SQL Queries Asynchronously On PostgreSQL](https://www.i-programmer.info/news/84-database/18129-pgdisatch-run-sql-queries-asynchronously-on-postgresql.html)
+- PatentLLM: [SQLite Optimization, PostgreSQL Async Queries, & DuckLake Dataframe Spec](https://media.patentllm.org/news/database/sqlite-optimization-postgresql-async-queries-ducklake-datafr-20260524)
+- VONNG: [504 Extensions: Expand the PostgreSQL Landscape](https://vonng.com/en/pg/extension-504/#20-pg_dispatch-async-sql-dispatch-on-top-of-pg_cron)
+
 ***
